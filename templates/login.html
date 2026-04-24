@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — AgriYu</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #d8f3dc, #f8fafc);
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAV */
+nav {
+  background: rgba(26,58,42,0.85);
+  backdrop-filter: blur(10px);
+  padding: 0 2rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo {
+  color: #52b788;
+  font-size: 1.4rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+.nav-logo span { color: #e9a318; }
+
+/* CENTER */
+.auth-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* CARD */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  animation: fadeIn 0.6s ease;
+}
+
+.auth-card h2 {
+  margin-bottom: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FORM */
+.form-group {
+  position: relative;
+  margin-bottom: 1.6rem;
+}
+
+input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+}
+
+/* FLOAT LABEL */
+label {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  font-size: 0.85rem;
+  color: #777;
+  background: white;
+  padding: 0 6px;
+  transition: 0.2s;
+  pointer-events: none;
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 0.7rem;
+  color: #2e7d32;
+}
+
+/* PASSWORD TOGGLE */
+.toggle {
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#2e7d32,#40916c);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+}
+
+/* FLASH */
+.flash {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+
+.flash.success { background: #d4edda; }
+.flash.error { background: #f8d7da; }
+
+/* EXTRA */
+.extra {
+  text-align: center;
+  margin-top: 1.2rem;
+  font-size: 0.85rem;
+}
+.extra a {
+  color: #2e7d32;
+  text-decoration: none;
+}
+.extra a:hover { text-decoration: underline; }
+
+/* ERROR TEXT */
+.error-text {
+  font-size: 0.75rem;
+  color: red;
+  margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Agri<span>Yu</span></a>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <h2>Welcome Back 🌿</h2>
+
+    <!-- FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" onsubmit="return validateForm()">
+
+      <div class="form-group">
+        <input type="text" name="username" id="username" required placeholder=" ">
+        <label>Username</label>
+        <div class="error-text" id="userErr"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="password" id="password" name="password" required placeholder=" ">
+        <label>Password</label>
+        <span class="toggle" onclick="togglePassword()">👁</span>
+        <div class="error-text" id="passErr"></div>
+      </div>
+
+      <button class="btn" id="btn" type="submit">Log In</button>
+
+    </form>
+
+    <div class="extra">
+      Don’t have an account? <a href="/register">Create one</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function togglePassword(){
+  const p = document.getElementById("password");
+  p.type = p.type === "password" ? "text" : "password";
+}
+
+function validateForm(){
+  let valid = true;
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  document.getElementById("userErr").textContent = "";
+  document.getElementById("passErr").textContent = "";
+
+  if(username.length < 3){
+    document.getElementById("userErr").textContent = "Username too short";
+    valid = false;
+  }
+
+  if(password.length < 4){
+    document.getElementById("passErr").textContent = "Password too short";
+    valid = false;
+  }
+
+  if(valid){
+    const btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+  }
+
+  return valid;
+}
+</script>
+
+</body>
+</html>
